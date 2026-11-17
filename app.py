@@ -3,10 +3,11 @@ The app: an App tab and a Monitoring tab. `uv run python app.py`
 
 Keep the logic in pipeline.py (or your own modules); this file only wires it to
 the interface and the logs. Keep `serve()` and the `/run` endpoint: check.py
-calls `serve()` locally and `/run` on your Space, with one input from
+calls `serve()` locally and `/run` on your deployed app, with one input from
 eval/cases.csv (text, or a file path).
 """
 
+import os
 import time
 
 import gradio as gr
@@ -107,4 +108,5 @@ with gr.Blocks(title=TITLE) as demo:
 
 
 if __name__ == "__main__":
-    demo.launch()
+    # Render gives the port in $PORT; locally it is 7860.
+    demo.launch(server_name="0.0.0.0", server_port=int(os.environ.get("PORT", 7860)))

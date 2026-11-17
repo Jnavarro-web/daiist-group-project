@@ -5,14 +5,9 @@ __pycache__/
 .ipynb_checkpoints/
 *.pyc
 
-# Logs are pushed to your private Hugging Face dataset, never to git
+# Local and exported logs, never in git
 logs/
-
-# Written by deploy.py from uv.lock
-requirements.txt
 
 # Never commit your API keys
 .env
 
-# Past logs downloaded from your Hugging Face dataset when the app starts
-logs_archive/

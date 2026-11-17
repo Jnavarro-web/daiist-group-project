@@ -22,8 +22,8 @@ The larger the team, the more it is expected to deliver. Mostly that means a bet
 
    One component's output must be the next one's input, in one flow. Two demos in two tabs do not count. Pretrained models and APIs are fine, and you do not have to train anything from scratch. You may reuse your own code from assignments 1–3; say whose and where in REPORT.md.
 
-3. **Deploy it** as a Gradio app on a public Hugging Face Space, with an **App** tab and a **Monitoring** tab. API keys go in the Space's secrets, never in the repo.
-4. **Log every request**: a summary of the input, the output of each component, the model and prompt versions, how long it took, what it cost, and the user's 👍/👎. **No personal data** (names, emails, faces, ID numbers…) anywhere: not in the logs, and not in the examples you use to test and demo the app. The template's logger sends the logs to a private Hugging Face dataset, because a Space's disk is wiped when it restarts.
+3. **Deploy it** as a public Gradio app on Render's free plan, with an **App** tab and a **Monitoring** tab. API keys go in the service's environment variables on Render, never in the repo.
+4. **Log every request**: a summary of the input, the output of each component, the model and prompt versions, how long it took, what it cost, and the user's 👍/👎. **No personal data** (names, emails, faces, ID numbers…) anywhere: not in the logs, and not in the examples you use to test and demo the app. The template's logger saves the online app's logs in a free Postgres database that Render creates with the app, because the app's disk is wiped when it restarts.
 5. **Monitor it.** The Monitoring tab shows, from the logs:
    - at least one **quality signal over time** (share of 👎, share of cases sent to review, confidence…);
    - one **drift check**: are today's inputs different from the ones you tested with? For example, compare the distribution of a feature or of the model's confidence (you will see how in the monitoring session);
@@ -63,9 +63,10 @@ uv run python app.py                 # the app, at http://127.0.0.1:7860
 uv run python main.py reference      # features of your reference inputs, for the drift check
 uv run python main.py evaluate       # component and end-to-end evaluation
 uv run python main.py drift-demo     # normal and shifted inputs; the alert must fire only on the shifted ones
-uv run python deploy.py              # uploads the app to your Space
 uv run python check.py               # checks that everything works, as the professor will
 ```
+
+There is no deploy command: once your fork is connected to Render (SETUP.md), every push to `main` puts the new version online.
 
 The template works from day one with placeholder components (simple stand-ins that return fixed answers), so you can put it online straight away and replace the pieces one by one:
 
@@ -76,7 +77,8 @@ The template works from day one with placeholder components (simple stand-ins th
 | `evaluate.py` | Runs your test cases through the product; you add the measures | Yes (or use `evaluate.ipynb`) |
 | `monitor.py` | The charts and the alert of the Monitoring tab | Yes: what you track and when the alert fires |
 | `logbook.py` | Saves every request and its 👍/👎 | You may add fields; don't remove any |
-| `env.py`, `main.py`, `deploy.py`, `check.py` | Internal pieces that make the rest work | No |
+| `env.py`, `main.py`, `check.py` | Internal pieces that make the rest work | No |
+| `render.yaml` | How Render builds and starts the app | Only `name` (and nothing else unless you know why) |
 
 The input files for the evaluation and the drift check are described in [eval/README.md](eval/README.md).
 
@@ -84,7 +86,7 @@ The input files for the evaluation and the drift check are described in [eval/RE
 
 ## What you submit
 
-- **Final submission, Mon 30 Nov, 23:59**, once per team. One member forks this repo and adds the rest of the team as collaborators. Tag the final version `final` (`git tag final && git push --tags`), open a PR to https://github.com/ami232/daiist-group-project, and submit on Blackboard: the PR link, the Space link, and a zip of the repo as a backup. After the deadline you may only fix things that keep the Space running.
+- **Final submission, Mon 30 Nov, 23:59**, once per team. One member forks this repo and adds the rest of the team as collaborators. Tag the final version `final` (`git tag final && git push --tags`), open a PR to https://github.com/ami232/daiist-group-project, and submit on Blackboard: the PR link, the app's link, and a zip of the repo as a backup. After the deadline you may only fix things that keep the app running.
 - **Presentation** in class, 1–3 Dec. The order is published after the final submission.
 - **Peer assessment**, each student on their own, on Blackboard after the presentations. Your teammates do not see it.
 
@@ -92,14 +94,14 @@ The input files for the evaluation and the drift check are described in [eval/RE
 ## Presentation
 
 - 6 minutes, then 4 minutes of questions.
-- Show the **live product on the Space**, not screenshots: one normal case, one case it gets wrong or sends to review, and the Monitoring tab. A recorded backup video is allowed if the network fails.
+- Show the **live product online**, not screenshots: one normal case, one case it gets wrong or sends to review, and the Monitoring tab. A recorded backup video is allowed if the network fails.
 - Every team member must be able to explain every part: the professor chooses who answers each question.
 - While the other teams present, you rate each of them as a potential user or buyer: did you understand the problem, does it work, would you trust it, would you buy it. You submit your ratings on Blackboard at the end of each presentation session, and doing so for every team counts towards class participation.
 
 
 ## Grading
 
-Anyone must be able to run your app from the `final` version, with their own keys, by following SETUP.md. If your Space happens to be down when it is graded, that is not a problem as long as this works.
+Anyone must be able to run your app from the `final` version, with their own keys, by following SETUP.md. If your online app happens to be down when it is graded, that is not a problem as long as this works.
 
 | Part | Weight |
 |---|---|

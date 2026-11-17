@@ -2,7 +2,7 @@
 
 - **Team** (Blackboard group name):
 - **Section**: [BBADBA 5A | BBADBA 5B | PPLEDBA 5A]
-- **Space URL**:
+- **App URL** (on Render):
 - **Final commit** (tag `final`):
 
 *At most about 3,000 words, tables excluded. Members and who did what go in CONTRIBUTIONS.md.*
