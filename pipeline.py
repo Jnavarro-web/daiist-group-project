@@ -14,12 +14,12 @@ from PIL import Image, ImageOps, ImageStat
 
 import store
 
-MODEL = "gemini-3.1-flash-lite"
+MODEL = "gemini-3.5-flash-lite"
 VERSIONS = {"component_a": f"{MODEL}/grocery-vision-v1", "component_b": f"{MODEL}/catalog-agent-v2"}
 MAX_ITEMS = 30
 MAX_BYTES = 12 * 1024 * 1024
 # Paid standard rate in USD per million tokens. Convert at a stated scenario rate.
-USD_PER_MILLION_INPUT, USD_PER_MILLION_OUTPUT, EUR_PER_USD = 0.25, 1.50, 0.90
+USD_PER_MILLION_INPUT, USD_PER_MILLION_OUTPUT, EUR_PER_USD = 0.30, 2.50, 0.90
 LOGGER = logging.getLogger(__name__)
 GEMINI_HTTP_OPTIONS = types.HttpOptions(
     timeout=25000,

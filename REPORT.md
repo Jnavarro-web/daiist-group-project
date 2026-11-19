@@ -21,7 +21,7 @@ a match decision for each line. The application verifies each product ID
 against the store catalog. The route planner uses the verified shelf stops and
 the store's walkable paths to compute the route from Entrance to Checkout.
 
-Both AI components currently use Gemini 3.1 Flash-Lite with separate prompts
+Both AI components currently use Gemini 3.5 Flash-Lite with separate prompts
 and inputs. The agent uses Gemini function calling for the catalog lookup and
 structured match decisions. The route planner is deterministic.
 

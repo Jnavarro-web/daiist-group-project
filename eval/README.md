@@ -52,7 +52,7 @@ IDs. The team must write and label its own cases.
   chosen threshold.
 
 The structured output is scored directly. The starter records standard
-paid-tier cost estimates in EUR using USD prices of 0.25 and 1.50 per million
+paid-tier cost estimates in EUR using USD prices of 0.30 and 2.50 per million
 input and output tokens, respectively, at an illustrative EUR/USD conversion
 of €0.90 per US dollar. Actual free-tier charges differ.
 
