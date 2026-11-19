@@ -21,6 +21,13 @@ MAX_BYTES = 12 * 1024 * 1024
 # Paid standard rate in USD per million tokens. Convert at a stated scenario rate.
 USD_PER_MILLION_INPUT, USD_PER_MILLION_OUTPUT, EUR_PER_USD = 0.25, 1.50, 0.90
 LOGGER = logging.getLogger(__name__)
+GEMINI_HTTP_OPTIONS = types.HttpOptions(
+    timeout=25000,
+    retry_options=types.HttpRetryOptions(
+        attempts=3, initial_delay=0.6, max_delay=2, jitter=0.4,
+        http_status_codes=[500, 502, 503, 504],
+    ),
+)
 
 VISION_PROMPT = (
     "Read a photo of a grocery shopping list. Transcribe only the grocery items, in order, "
@@ -195,7 +202,7 @@ def evaluate_agent(items):
         not isinstance(item, str) or not item.strip() or len(item) > 160 for item in items
     ):
         raise ValueError("Agent test inputs must be a non-empty list of grocery items.")
-    with genai.Client(api_key=os.environ["GEMINI_API_KEY"], http_options=types.HttpOptions(timeout=25000)) as client:
+    with genai.Client(api_key=os.environ["GEMINI_API_KEY"], http_options=GEMINI_HTTP_OPTIONS) as client:
         return _catalog_agent(client, items, [])
 
 
@@ -227,7 +234,7 @@ def run(raw_input: str, *, products=None) -> dict:
         else:
             started = time.perf_counter()
             try:
-                with genai.Client(api_key=os.environ["GEMINI_API_KEY"], http_options=types.HttpOptions(timeout=25000)) as client:
+                with genai.Client(api_key=os.environ["GEMINI_API_KEY"], http_options=GEMINI_HTTP_OPTIONS) as client:
                     try:
                         items, unclear = _vision(client, image, billing_a)
                     finally:
