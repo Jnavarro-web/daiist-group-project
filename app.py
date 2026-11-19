@@ -175,7 +175,7 @@ with gr.Blocks(title=TITLE, delete_cache=(900, 900)) as demo:
                             raw_input = gr.Image(type="filepath", label="Shopping-list photo", sources=["upload"],
                                                  format="png", height=185)
                             with gr.Column():
-                                gr.Markdown("Choose a photo or screenshot of your grocery list.")
+                                gr.Markdown("Choose a photo or screenshot of your grocery list with no personal details.")
                                 run_button = gr.Button("Find my route", variant="primary", elem_id="find-route")
                     status = gr.Markdown(elem_id="route-feedback")
                     map_view = gr.HTML(
