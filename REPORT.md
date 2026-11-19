@@ -13,11 +13,31 @@
 
 ## Architecture
 
-*The two components and how one feeds the other: a diagram plus a short walk-through of one request from input to output. Which models or APIs, and why those. What you reused from assignments 1–3, and whose it was.*
+`list photo → Gemini vision → grocery lines → Gemini catalog agent → verified product IDs and shelf sides → walking route`
+
+The vision call reads the image into ordered grocery lines and flags unclear
+text. The agent receives those lines, calls the local catalog tool and returns
+a match decision for each line. The application verifies each product ID
+against the store catalog. The route planner uses the verified shelf stops and
+the store's walkable paths to compute the route from Entrance to Checkout.
+
+Both AI components currently use Gemini 3.1 Flash-Lite with separate prompts
+and inputs. The agent uses Gemini function calling for the catalog lookup and
+structured match decisions. The route planner is deterministic.
+
+*Team to document model choices and any code reused from Assignments 1–3.*
 
 ## Data
 
-*Where each component's data comes from, with links, licences and sizes. Confirm that there is no personal data in your inputs or logs.*
+The app bundles a synthetic supermarket catalog, floor plan, and walking
+graph in `store.json`. They were prepared for the demonstration and are
+independent of the evaluation photos. The application logs a generic image
+summary, numerical photo brightness, redacted vision output, and verified
+catalog results. Request records exclude raw photos, upload paths, and
+unrestricted transcriptions.
+
+*Team to document the evaluation images, sources and permissions, dataset
+sizes, and verify that the images contain no personal details.*
 
 ## Evaluation
 
@@ -35,7 +55,15 @@
 
 ## Operations
 
-*What you log. The quality signal and the drift check you monitor, the reference set, and the alert threshold with its justification. The drift demo: what you shifted, and the result with the alert firing (screenshot or numbers). The rate of false alarms on normal inputs.*
+The Monitoring tab shows the share of requests sent to review and the
+share of rated requests that received a thumbs down. It compares grayscale
+image brightness in recent requests with a reference set using population
+stability index (PSI). A template alert rule combines a minimum PSI and a
+sample-size adjustment. The deployment blueprint provisions Postgres for
+request and feedback logs.
+
+*Team to choose and justify the final rule and document the normal and
+shifted runs, their alert outcomes, and the rate of false alarms.*
 
 ## Failures
 
@@ -51,8 +79,14 @@
 
 ## How to run it
 
-*Anything beyond SETUP.md that the professor needs to run it: which keys, any download step, how long the first run takes.*
+Follow `SETUP.md` and provide `GEMINI_API_KEY`. The demo store file is
+bundled locally. See `eval/README.md` for the offline preflight, scoring
+command, and drift replay.
 
 ## AI use
 
-*What you used and how, or "none".*
+Codex was used to develop and test the Aisle Run demo and Gradio code,
+including the two AI components, the route planner, evaluation tooling,
+and this technical description.
+
+*Team to verify and complete this disclosure before submission.*
