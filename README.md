@@ -1,10 +1,13 @@
 # Tender Desk
 
-An English Gradio app for Spanish public construction tenders. Start it with
-`uv run python app.py`, then load the TED example or paste a public notice
-excerpt with personal details removed. The local setup and retraining commands
-are in [SETUP.md](SETUP.md#tender-desk-data). Results from the TED data audit
-and historical model benchmark are in [REPORT.md](REPORT.md).
+An English Gradio app for Spanish public construction tenders. Open the
+[public Render app](https://construction-tender-desk.onrender.com/) and select
+**Load TED example** or paste a public excerpt with contact details removed.
+
+- [Evaluation instructions and drift replay](eval/README.md)
+- [30 candidate cases with TED sources](eval/case-plan.csv)
+- [Assignment report](REPORT.md)
+- [Local setup and retraining](SETUP.md#tender-desk-data)
 
 # Group assignment: Build and run an AI product
 

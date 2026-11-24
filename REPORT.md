@@ -2,7 +2,7 @@
 
 - **Team** (Blackboard group name) — to be confirmed
 - **Section** — to be confirmed
-- **App URL** (on Render) — pending deployment
+- **App URL** (on Render) — https://construction-tender-desk.onrender.com/
 - **Final commit** (tag `final`) — pending team evaluation
 
 ## Business case
@@ -128,17 +128,22 @@ latency and cost across varied excerpts. See [Gemini pricing](https://ai.google.
 
 Each request records its length, model and prompt versions, controlled
 fields, decision, token count, estimated cost, latency and optional user
-feedback. Review rate is the primary quality signal. The dashboard compares
+feedback. Render persists Tender Desk logs in separate Postgres tables. Review rate is the primary quality signal. The dashboard compares
 input features against a reference set using the population stability index
 (PSI). The alert threshold is the greater of 0.25 and twice the expected
 sampling noise, with a 20-request minimum in the dashboard. This avoids
 flagging small swings in short windows. The team should validate the rule on
 its own reference and shifted excerpts.
 
-A feature-level smoke test with 30 in-scope reference rows stayed quiet with
-20 in-scope rows (PSI 0.000) and fired on 20 out-of-scope rows (PSI 18.419).
-The threshold in both runs was 0.667. The team still needs to run the
-end-to-end drift replay with 30 reference excerpts and 10 shifted excerpts.
+The monitored feature is the share of explicit primary CPVs outside
+construction. A practice replay used 30 distinct Spanish construction
+reference excerpts. It stayed quiet on 14 normal construction cases
+(PSI 0.000, threshold 0.838) and alerted on 10 Spanish cleaning notices
+(PSI 18.419, threshold 1.067). This tests a sector shift with country held
+constant. It measures the behaviour of the drift rule and does not measure
+a change in model accuracy. The team will rerun the check on its final
+normal cases. The live dashboard needs 20 recent requests with an explicit
+primary CPV to evaluate the alert.
 
 ## Failures
 

@@ -85,13 +85,19 @@ def refresh_monitor():
     reference = monitor.load_reference()
     if reference is None:
         message = "The team’s reference set is pending. Review rate, latency and cost are recorded below."
-    elif len(logs) < monitor.MIN_WINDOW:
-        message = f"Drift alerts start after {monitor.MIN_WINDOW} requests."
+    elif len(logs) < monitor.MIN_WINDOW or "f_outside_construction" not in logs:
+        message = f"Sector drift needs {monitor.MIN_WINDOW} recent notices with an explicit primary CPV."
     else:
         alerts = monitor.alerts(logs, reference)
-        message = "\n".join(f"- {message}" for message in alerts) if alerts else "No alerts in the current window."
+        has_sector_window = monitor.live_features(logs)["outside_construction"].count() >= monitor.MIN_WINDOW
+        if alerts:
+            message = "\n".join(f"- {alert}" for alert in alerts)
+        elif has_sector_window:
+            message = "No alerts in the current window."
+        else:
+            message = f"Sector drift needs {monitor.MIN_WINDOW} recent notices with an explicit primary CPV."
     drift = None
-    if reference is not None and len(logs) >= monitor.MIN_WINDOW:
+    if reference is not None and len(logs) >= monitor.MIN_WINDOW and "f_outside_construction" in logs:
         drift = monitor.drift(reference, monitor.live_features(logs))
     labels = {
         "requests": "Requests", "sent to review": "Sent to review",
