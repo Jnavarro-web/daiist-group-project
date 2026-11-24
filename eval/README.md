@@ -28,3 +28,23 @@ If you use an LLM judge: your own labels for 20+ cases (`id`, `label`, `comment`
 ## `shifted.csv`: the drift demo
 
 10 or more inputs that you shifted on purpose (one `input` column): darker photos, another language, another customer segment… `uv run python main.py drift-demo` checks that your alert fires on these and stays quiet on the `normal` cases.
+
+## Tender Desk
+
+Use inline, contact-free notices in the `input` column. Keep award outcomes out
+of the notice text. In `expected`, enter a JSON object with `facts`, the
+`decision` (bid, no_bid or review), and `actual_offers` (integer or null when
+there is no known outcome). The keys in `facts` match the fields in the app’s
+“Extracted facts and estimate” panel. Write the manual reviewer’s decision in
+`baseline`. Run the comparison with the company fit left unconfirmed, which is
+also the default for the /run endpoint.
+
+For each case, read the notice to label the fields, and open the linked award
+notice separately to verify the actual number of offers. The prediction can
+differ from the outcome. Choose your own decision labels before seeing the
+app’s output. Record review time for the manual baseline and for the assisted
+workflow if comparing time savings.
+
+For the drift exercise, compare Spanish public works with notices from a
+different country or sector. Use contact-free excerpts and the existing
+`reference` and `drift-demo` commands.

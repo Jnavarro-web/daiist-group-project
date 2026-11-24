@@ -1,3 +1,11 @@
+# Tender Desk
+
+An English Gradio app for Spanish public construction tenders. Start it with
+`uv run python app.py`, then load the TED example or paste a public notice
+excerpt with personal details removed. The local setup and retraining commands
+are in [SETUP.md](SETUP.md#tender-desk-data). Results from the TED data audit
+and historical model benchmark are in [REPORT.md](REPORT.md).
+
 # Group assignment: Build and run an AI product
 
 As a team, build a small AI product for one business process, put it online, and run it like a product: it logs its own use, watches itself for drift, and you decide, with evidence, whether anyone should rely on it.
@@ -66,9 +74,9 @@ uv run python main.py drift-demo     # normal and shifted inputs; the alert must
 uv run python check.py               # checks that everything works, as the professor will
 ```
 
-There is no deploy command: once your fork is connected to Render (SETUP.md), every push to `main` puts the new version online.
+There is no deploy command: once your fork is connected to Render (SETUP.md), pushes to the branch selected in Render deploy automatically.
 
-The template works from day one with placeholder components (simple stand-ins that return fixed answers), so you can put it online straight away and replace the pieces one by one:
+Tender Desk uses the following course-template entry points:
 
 | File | What it does | Do you change it? |
 |---|---|---|
