@@ -173,9 +173,9 @@ with gr.Blocks(title=TITLE, delete_cache=(900, 900)) as demo:
                     with gr.Accordion("Upload a shopping list", open=False, elem_id="upload-my-list"):
                         with gr.Row():
                             raw_input = gr.Image(type="filepath", label="Shopping-list photo", sources=["upload"],
-                                                 format="png", height=185)
+                                                 format="png", image_mode=None, height=185)
                             with gr.Column():
-                                gr.Markdown("Choose a photo or screenshot of your grocery list with no personal details.")
+                                gr.Markdown("Upload a JPG, PNG, or HEIC photo of your list, up to 12 MB. Leave out personal details.")
                                 run_button = gr.Button("Find my route", variant="primary", elem_id="find-route")
                     status = gr.Markdown(elem_id="route-feedback")
                     map_view = gr.HTML(

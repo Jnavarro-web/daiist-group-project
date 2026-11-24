@@ -11,8 +11,11 @@ from pathlib import Path
 from google import genai
 from google.genai import errors, types
 from PIL import Image, ImageOps, ImageStat
+from pillow_heif import register_heif_opener
 
 import store
+
+register_heif_opener()
 
 MODEL = "gemini-3.5-flash-lite"
 VERSIONS = {"component_a": f"{MODEL}/grocery-vision-v1", "component_b": f"{MODEL}/catalog-agent-v2"}
