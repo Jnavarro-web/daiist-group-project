@@ -16,6 +16,9 @@ html:has(gradio-app), body:has(gradio-app) {
     --border-color-primary: var(--td-edge);
     --block-background-fill: var(--td-surface);
     --block-label-text-color: var(--td-ink);
+    --block-info-text-color: var(--td-muted);
+    --input-text-color: var(--td-ink);
+    --body-text-color-subdued: var(--td-muted);
     --input-background-fill: #f8fafb;
     --input-border-color: #c6d6dc;
     --input-placeholder-color: #59717b;
@@ -74,7 +77,7 @@ html:has(gradio-app), body:has(gradio-app) {
     overflow: hidden;
     display: flex;
     align-items: center;
-    min-height: 214px;
+    min-height: 182px;
     border-radius: 18px;
     background: linear-gradient(108deg, #102c39 25%, #144651);
     color: #f5fbfc;
@@ -160,6 +163,7 @@ html:has(gradio-app), body:has(gradio-app) {
 }
 
 #tender-tabs [role="tab"] {
+    color: var(--td-ink);
     padding: 10px 18px;
     min-height: 44px;
     font-weight: 700;
@@ -202,14 +206,76 @@ html:has(gradio-app), body:has(gradio-app) {
     font-size: 13px;
 }
 
-#tender-fit fieldset { padding: 0; }
-#tender-fit legend { font-weight: 700; margin-bottom: 6px; }
-
-#tender-input, #tender-fit {
+#tender-input {
     padding: 0;
     border: 0;
     box-shadow: none;
 }
+
+#tender-input textarea {
+    background: #f8fafb;
+    color: var(--td-ink);
+    border: 1px solid #b7cad0;
+}
+
+#tender-input textarea::placeholder { color: #526873; opacity: 1; }
+
+.td-fit-heading p {
+    margin: 6px 0 0;
+    color: var(--td-muted);
+    font-size: 14px;
+}
+
+#tender-fit {
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+    min-width: 0;
+    overflow: visible !important;
+}
+
+#tender-fit > .wrap:has(> label) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+}
+
+#tender-fit label {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    margin: 0;
+    padding: 7px 11px;
+    gap: 9px;
+    border: 1px solid #c8d7db;
+    border-radius: 8px;
+    background: #f8fafb;
+    color: var(--td-ink);
+}
+
+#tender-fit label span { color: var(--td-ink); font-size: 14px; }
+#tender-fit label:has(:checked) {
+    border-color: #3d847b;
+    background: #eaf5f2;
+}
+#tender-fit label:has(:checked) span { font-weight: 700; }
+#tender-fit input[type="radio"] {
+    appearance: auto;
+    accent-color: var(--td-teal);
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+}
+
+#tender-team { background: #f5f8f9; border-color: var(--td-edge); }
+#tender-team button, #tender-team input, #tender-team label, #tender-case [role="option"] {
+    color: var(--td-ink);
+}
+#tender-case input, #tender-case .wrap-inner, #tender-case [role="listbox"] { background: white; }
+#tender-case .wrap-inner { border-color: #b7cad0; }
+#tender-case [data-testid="block-info"] { color: var(--td-ink); }
+#tender-case [role="option"]:hover { background: #eaf5f2; }
 
 .td-panel-heading { align-items: center; gap: 8px; }
 #tender-example {

@@ -1,5 +1,6 @@
 """Tender Desk's Gradio interface and assignment-compatible /run endpoint."""
 
+import csv
 import os
 import time
 from html import escape
@@ -25,14 +26,31 @@ HEADER = """
 </div>
 <header class="td-hero">
     <div class="td-hero-copy">
-        <p class="td-scope">Spanish public works</p>
+        <p class="td-scope">Spanish public construction tenders</p>
         <h1>Should we bid?</h1>
-        <p>Review a construction tender, estimate the competition, and decide whether to prepare a bid.</p>
+        <p>Paste a public tender to see its key details, estimated competition, and whether it needs a closer look.</p>
     </div>
     <div class="td-blueprint" aria-hidden="true"><div class="td-plan"></div></div>
 </header>
 """
-EMPTY_RESULT = "Paste a tender and select **Analyse tender** to see your recommendation."
+EMPTY_RESULT = (
+    "Your recommendation will appear here after you select **Analyse tender**. "
+    "You’ll also see the contract details and an estimate of how many offers it may receive."
+)
+FIT_CHOICES = [
+    ("Not sure yet", pipeline.DEFAULT_FIT),
+    ("We meet the requirements", pipeline.FIT_OPTIONS[1]),
+    ("We fail a mandatory requirement", pipeline.FIT_OPTIONS[2]),
+]
+CASE_PLAN = Path(__file__).with_name("eval") / "case-plan.csv"
+with CASE_PLAN.open(newline="", encoding="utf-8") as case_file:
+    TEAM_CASES = {row["id"]: row["input"] for row in csv.DictReader(case_file)}
+
+
+def prepare_notice(notice: str) -> tuple:
+    """Fill the form and clear any result left by the previous notice."""
+    return notice, pipeline.DEFAULT_FIT, EMPTY_RESULT, "", None, ""
+
 
 
 def serve(raw_input: str, fit: str = pipeline.DEFAULT_FIT) -> dict:
@@ -121,23 +139,43 @@ with gr.Blocks(title=TITLE) as demo:
             with gr.Row(elem_id="tender-workspace"):
                 with gr.Column(scale=6, min_width=0, elem_classes=["td-panel", "td-form"]):
                     with gr.Row(elem_classes="td-panel-heading"):
-                        gr.Markdown("## Tender notice", elem_classes="td-section-title")
+                        gr.Markdown("## 1. Add a tender", elem_classes="td-section-title")
                         sample = gr.Button("Load TED example", size="sm", scale=0, min_width=0,
                                            elem_id="tender-example")
+                    gr.Markdown(
+                        "Paste the text from a Spanish public construction notice, or load the example to try it.",
+                        elem_classes="td-help",
+                    )
+                    with gr.Accordion("Load an assigned test case", open=False, elem_id="tender-team"):
+                        gr.Markdown(
+                            "Write down your expected answers before running a case. "
+                            "[Open the case plan](https://github.com/Jnavarro-web/daiist-group-project/blob/codex/tender-tool/eval/case-plan.csv) "
+                            "for the original notice and award links.",
+                            elem_classes="td-help",
+                        )
+                        case_id = gr.Dropdown(
+                            list(TEAM_CASES), value=None, num_choices_shown=7,
+                            label="Choose your case ID (c01–c30)", elem_id="tender-case",
+                        )
                     raw_input = gr.Textbox(
                         label="Tender notice text", show_label=False,
-                        placeholder="Paste the tender notice here in Spanish or English…",
-                        lines=7, max_lines=16, elem_id="tender-input",
+                        placeholder="Paste the tender notice text in Spanish or English…",
+                        lines=6, max_lines=16, elem_id="tender-input",
                     )
                     gr.Markdown("Remove contact names, emails, and phone numbers before pasting.",
                                 elem_classes="td-help")
+                    gr.Markdown(
+                        "## 2. Check company fit\n\n"
+                        "Choose **Not sure yet** for the example or if you haven’t checked the requirements.",
+                        elem_classes=["td-section-title", "td-fit-heading"],
+                    )
                     fit = gr.Radio(
-                        pipeline.FIT_OPTIONS, value=pipeline.DEFAULT_FIT,
-                        label="Can your company meet the tender requirements?", elem_id="tender-fit",
+                        FIT_CHOICES, value=pipeline.DEFAULT_FIT, container=False,
+                        show_label=False, label="Company fit", elem_id="tender-fit",
                     )
                     run_button = gr.Button("Analyse tender", variant="primary", elem_id="tender-analyse")
                 with gr.Column(scale=5, min_width=0, elem_classes=["td-panel", "td-result"]):
-                    gr.Markdown("## Bid guidance", elem_classes="td-section-title")
+                    gr.Markdown("## 3. Read the result", elem_classes="td-section-title")
                     guidance = gr.Markdown(EMPTY_RESULT, elem_id="tender-guidance")
                     with gr.Column(elem_id="tender-expanded"):
                         summary = gr.Markdown(elem_id="tender-facts")
@@ -146,8 +184,15 @@ with gr.Blocks(title=TITLE) as demo:
                         with gr.Row(elem_classes="td-feedback"):
                             up = gr.Button("Useful", size="sm")
                             down = gr.Button("Needs improvement", size="sm")
-            sample.click(lambda: (pipeline.DATA / "example.txt").read_text(encoding="utf-8"),
-                         None, raw_input, api_name=False)
+            form = [raw_input, fit, guidance, summary, details, request_id]
+            sample.click(
+                lambda: prepare_notice((pipeline.DATA / "example.txt").read_text(encoding="utf-8")),
+                None, form, api_name=False,
+            )
+            case_id.input(
+                lambda selected: prepare_notice(TEAM_CASES.get(selected, "")),
+                case_id, form, api_name=False,
+            )
             run_button.click(
                 on_run, [raw_input, fit], [guidance, summary, details, request_id],
                 api_name="run", scroll_to_output=True,
