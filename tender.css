@@ -286,6 +286,13 @@ html:has(gradio-app), body:has(gradio-app) {
     font-weight: 700;
 }
 #tender-analyse { min-height: 48px; font-weight: 750; border-radius: 9px; }
+#tender-clean {
+    align-self: flex-start;
+    min-height: 36px;
+    padding-inline: 12px;
+    color: var(--td-teal);
+    background: #eef5f5;
+}
 
 #tender-guidance {
     padding: 17px 18px;

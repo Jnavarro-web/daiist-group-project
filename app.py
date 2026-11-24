@@ -162,8 +162,12 @@ with gr.Blocks(title=TITLE) as demo:
                         placeholder="Paste the tender notice text in Spanish or English…",
                         lines=6, max_lines=16, elem_id="tender-input",
                     )
-                    gr.Markdown("Remove contact names, emails, and phone numbers before pasting.",
-                                elem_classes="td-help")
+                    gr.Markdown(
+                        "Tender Desk automatically removes common contact details before analysis. "
+                        "You can preview the cleaned text and remove anything it misses.",
+                        elem_classes="td-help",
+                    )
+                    clean = gr.Button("Remove contact details", size="sm", elem_id="tender-clean")
                     gr.Markdown(
                         "## 2. Check company fit\n\n"
                         "Choose **Not sure yet** for the example or if you haven’t checked the requirements.",
@@ -189,6 +193,7 @@ with gr.Blocks(title=TITLE) as demo:
                 lambda: prepare_notice((pipeline.DATA / "example.txt").read_text(encoding="utf-8")),
                 None, form, api_name=False,
             )
+            clean.click(pipeline.sanitize, raw_input, raw_input, api_name=False)
             case_id.input(
                 lambda selected: prepare_notice(TEAM_CASES.get(selected, "")),
                 case_id, form, api_name=False,

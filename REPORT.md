@@ -60,7 +60,10 @@ offers received, which may include joint bids. The budget is the published
 pre-award estimate excluding VAT. The included table contains selected
 non-personal fields and publication IDs. The app's example is a shortened,
 contact-free excerpt prepared from the TED fields. The app logs structured
-fields and never stores the pasted notice text. See the [TED CSV release](https://data.europa.eu/data/datasets/ted-csv),
+fields and never stores the pasted notice text. It removes recognizable
+contact fields, email addresses, phone numbers and personal identifiers
+on the app server before calling Gemini. The preview button lets a user check the
+cleaned text for details that need manual removal. See the [TED CSV release](https://data.europa.eu/data/datasets/ted-csv),
 [TED codebook](https://data.europa.eu/data-management/store/api/legacy/data/ted-csv-data-information-v3-6.pdf/)
 and [TED reuse terms](https://ted.europa.eu/en/legal-notice).
 
@@ -148,7 +151,10 @@ primary CPV to evaluate the alert.
 ## Failures
 
 Two local smoke requests hit Gemini service failures and returned manual
-review. An out-of-scope notice also went to review as designed. The
+review. The SDK retries transient errors with the same configured model.
+If extraction still fails, the app records the failed request and opens
+the review path without an offer estimate. This keeps model availability
+separate from the decision about whether to bid. An out-of-scope notice also went to review as designed. The
 historical error band is wide enough for low and high offer counts to
 overlap on some tenders. The next evaluation should count extraction
 failures, missing source fields, unsupported notices and large prediction
@@ -168,6 +174,14 @@ The team will make its final go/no-go decision from the labeled evaluation,
 review workload and measured time saved. For a 40-notice month across
 20 working days, reviewing every notice would mean two reviews per working
 day. Replace that scenario with the observed review rate when results are in.
+
+## Presentation
+
+Open the Render app a few minutes early. Show one live normal case, a
+separate case that goes to review, and the Monitoring tab. The TED example
+button fills the form immediately. Selecting **Analyse tender** calls
+Gemini and can take longer. Record a backup of that same flow in case the
+network fails. See [Render's free-tier behavior](https://render.com/docs/free).
 
 ## How to run it
 

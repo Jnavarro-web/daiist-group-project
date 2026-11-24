@@ -83,22 +83,65 @@ def drift_features(text: str) -> dict[str, int]:
     return {"outside_construction": int(not next(iter(codes)).startswith("45"))}
 
 
+CONTACT_FIELDS = (
+    r"(?:contact(?: person| point(?:\(s\)|s)?| name| details)?|contacto|"
+    r"(?:persona|punto|nombre|datos) de contacto|a la atenci[oó]n de|"
+    r"for the attention of|e-?mail|correo electr[oó]nico|"
+    r"tel(?:[eé]fono|ephone|\.)?|phone|fax|DNI|NIE)"
+)
 CONTACT_LINE = re.compile(
-    r"^\s*(?:contact(?: point|o)?|persona de contacto|e-?mail|correo electr[oó]nico|"
-    r"tel(?:[eé]fono|ephone|\.)?|phone|fax|DNI|NIE)\s*[:.]",
+    rf"^\s*{CONTACT_FIELDS}(?:\s*[:：]\s*(?P<value>.*)|\s*)$", re.IGNORECASE,
+)
+NAME_WORD = r"[A-ZÀ-ÖØ-Þ][^\W\d_]+"
+NAME_CONTINUATION = rf"(?:[ ’'-]+(?:(?:de|del|la|las|los)\s+){{0,2}}{NAME_WORD})"
+NAME_LINE = re.compile(rf"{NAME_WORD}{NAME_CONTINUATION}{{0,5}}")
+PERSONAL_TOKEN = re.compile(
+    r"[\w.+%-]+@[\w.-]+\.[A-Za-z]{2,}|"
+    r"\b(?:\d{8}|[XYZ]\d{7})[A-Z]\b|"
+    r"(?<!\w)(?:\+|00)\d{1,3}[ .-]?(?:\(?\d\)?[ .-]?){8,12}(?=\W|$)",
     re.IGNORECASE,
 )
-PERSONAL_TOKEN = re.compile(
-    r"[\w.+%-]+@[\w.-]+\.[A-Za-z]{2,}|\b(?:\d{8}|[XYZ]\d{7})[A-Z]\b|"
-    r"(?<!\w)\+\d{1,3}(?:[ .-]?\d){8,12}\b",
+LOCAL_PHONE = (
+    r"(?<![\w.,])(?:[6789]\d{2}[ -]\d{3}[ -]\d{3}|"
+    r"[6789]\d{2}[ -]\d{2}[ -]\d{2})(?!\w|[.,]\d)"
+)
+PHONE_LINE = re.compile(r"[\d+(). -]{7,25}$")
+AMOUNT_LINE = re.compile(
+    r"€|\b(?:EUR|budget|estimated (?:value|total)|(?:valor|presupuesto) estimado|IVA|VAT)\b",
     re.IGNORECASE,
+)
+INLINE_PHONE = re.compile(
+    r"\b(?:tel(?:[eé]fono|ephone|\.)?|phone|fax)\s*[:：]?\s*"
+    r"(?:\+\d{1,3}[ .-]?)?\(?\d\)?(?:[ .()-]?\d){7,11}(?!\d)",
+    re.IGNORECASE,
+)
+INLINE_CONTACT = re.compile(
+    r"\b(?i:please contact|for questions contact|contacte con|contactar con)\s+"
+    rf"{NAME_WORD}{NAME_CONTINUATION}{{1,4}}"
 )
 
 
 def sanitize(text: str) -> str:
-    return PERSONAL_TOKEN.sub("[redacted]", "\n".join(
-        line for line in text.splitlines() if not CONTACT_LINE.match(line)
-    ))
+    """Remove recognizable contact data locally before the model sees the notice."""
+    cleaned = []
+    awaiting_value = False
+    for line in text.splitlines():
+        if awaiting_value and not line.strip():
+            continue
+        contact = CONTACT_LINE.fullmatch(line)
+        if contact:
+            awaiting_value = not contact["value"]
+            continue
+        if awaiting_value and (NAME_LINE.fullmatch(line.strip()) or PHONE_LINE.fullmatch(line.strip())):
+            awaiting_value = False
+            continue
+        awaiting_value = False
+        line = INLINE_CONTACT.sub("[contact removed]", line)
+        line = INLINE_PHONE.sub("[phone removed]", PERSONAL_TOKEN.sub("[redacted]", line))
+        if not AMOUNT_LINE.search(line):
+            line = re.sub(LOCAL_PHONE, "[phone removed]", line)
+        cleaned.append(line)
+    return "\n".join(cleaned).strip()
 
 
 @lru_cache(maxsize=1)
