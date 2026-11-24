@@ -69,6 +69,20 @@ SUBMIT = types.Tool(function_declarations=[types.FunctionDeclaration(
     description="Submit the validated tender fields from the notice.",
     parameters_json_schema=Facts.model_json_schema(),
 )])
+PRIMARY_CPV = re.compile(
+    r"^\s*(?:main CPV(?: code)?|(?:c[oó]digo )?CPV principal)\s*:\s*([0-9]{8})(?![0-9])",
+    re.IGNORECASE | re.MULTILINE,
+)
+
+
+def drift_features(text: str) -> dict[str, int]:
+    """Track changes in sector among notices with an explicit primary CPV."""
+    codes = set(PRIMARY_CPV.findall(text[:MAX_CHARS]))
+    if len(codes) != 1:
+        return {}
+    return {"outside_construction": int(not next(iter(codes)).startswith("45"))}
+
+
 CONTACT_LINE = re.compile(
     r"^\s*(?:contact(?: point|o)?|persona de contacto|e-?mail|correo electr[oó]nico|"
     r"tel(?:[eé]fono|ephone|\.)?|phone|fax|DNI|NIE)\s*[:.]",
@@ -198,7 +212,7 @@ def run(raw_input: str, fit: str = DEFAULT_FIT) -> dict:
     else:
         facts, tokens, cost, problem = extract(text)
     result = recommend(facts, fit, problem)
-    features = {"notice_chars": len(text)}
+    features = {"notice_chars": len(text)} | drift_features(text)
     if facts and facts.cpv and facts.country != "unknown":
         features["outside_scope"] = int(facts.country != "ES" or not facts.cpv.startswith("45"))
     if facts and facts.budget_eur is not None:

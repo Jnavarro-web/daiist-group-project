@@ -56,7 +56,7 @@ The free service has limits that matter for your design:
 
 `logbook.py` saves every request and every 👍/👎. Where it saves them depends on where the app runs:
 
-- **Online**, in a free Postgres database that Render creates with your app (it is declared in `render.yaml`, and Render gives the app its address in `DATABASE_URL`). The app's own disk is wiped on every restart, sleep and redeploy; the database is not.
+- **Online**, in Render Postgres. The team Blueprint references the existing workspace database and Render supplies `DATABASE_URL`. The app's own disk is wiped on every restart, sleep and redeploy; the database is not.
 - **On your laptop**, in JSON files in `logs/`, which is git-ignored. Leave `DATABASE_URL` empty in `.env`, so your tests don't mix with real use.
 
 The Monitoring tab reads the logs from wherever the app is running.
@@ -95,7 +95,12 @@ The checked-in model runs as soon as the packages are installed and
 `GEMINI_API_KEY` is configured. For local use run `uv run python app.py`.
 For a separate Render service, the Blueprint name is `construction-tender-desk`;
 choose `codex/tender-tool` as the branch and set the Gemini key in Environment.
-Keep the sample file and model in the repo.
+Keep the sample file and model in the repo. On the team workspace the Blueprint
+references the existing Frankfurt Postgres `daiist-group-project-logs`. Tender
+Desk uses its own tables `tender_desk_requests` and `tender_desk_feedback`.
+On a different workspace, deploy a web service with the same build/start
+commands and set `DATABASE_URL` to that workspace's Render Postgres, or create
+a database and update the Blueprint reference before applying it.
 
 To repeat the audit and training, download the 2018–2023 Calls for Competition
 and Contract Award Notices CSV ZIP distributions from the

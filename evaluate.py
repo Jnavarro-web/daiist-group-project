@@ -31,7 +31,7 @@ def main() -> None:
     for case in cases:
         expected = json.loads(case["expected"])
         started = time.perf_counter()
-        result = pipeline.run(case["input"])
+        result = pipeline.run(case["input"], expected.get("fit", pipeline.DEFAULT_FIT))
         seconds = time.perf_counter() - started
         fields, guidance = (result["outputs"][name] for name in ("component_a", "component_b"))
         checks = [key in fields and matching(value, fields[key])
