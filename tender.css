@@ -220,12 +220,6 @@ html:has(gradio-app), body:has(gradio-app) {
 
 #tender-input textarea::placeholder { color: #526873; opacity: 1; }
 
-.td-fit-heading p {
-    margin: 6px 0 0;
-    color: var(--td-muted);
-    font-size: 14px;
-}
-
 #tender-fit {
     padding: 0;
     border: 0;
@@ -268,8 +262,8 @@ html:has(gradio-app), body:has(gradio-app) {
     margin: 0;
 }
 
-#tender-team { background: #f5f8f9; border-color: var(--td-edge); }
-#tender-team button, #tender-team input, #tender-team label, #tender-case [role="option"] {
+:is(#tender-team, #tender-eligibility) { background: #f5f8f9; border-color: var(--td-edge); }
+:is(#tender-team, #tender-eligibility) button, #tender-team input, #tender-team label, #tender-case [role="option"] {
     color: var(--td-ink);
 }
 #tender-case input, #tender-case .wrap-inner, #tender-case [role="listbox"] { background: white; }

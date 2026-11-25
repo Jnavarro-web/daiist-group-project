@@ -38,9 +38,9 @@ EMPTY_RESULT = (
     "You’ll also see the contract details and an estimate of how many offers it may receive."
 )
 FIT_CHOICES = [
-    ("Not sure yet", pipeline.DEFAULT_FIT),
-    ("We meet the requirements", pipeline.FIT_OPTIONS[1]),
-    ("We fail a mandatory requirement", pipeline.FIT_OPTIONS[2]),
+    ("Eligibility not checked", pipeline.DEFAULT_FIT),
+    ("Company meets all mandatory requirements", pipeline.FIT_OPTIONS[1]),
+    ("Company fails a mandatory requirement", pipeline.FIT_OPTIONS[2]),
 ]
 CASE_PLAN = Path(__file__).with_name("eval") / "case-plan.csv"
 with CASE_PLAN.open(newline="", encoding="utf-8") as case_file:
@@ -168,18 +168,20 @@ with gr.Blocks(title=TITLE) as demo:
                         elem_classes="td-help",
                     )
                     clean = gr.Button("Remove contact details", size="sm", elem_id="tender-clean")
-                    gr.Markdown(
-                        "## 2. Check company fit\n\n"
-                        "Choose **Not sure yet** for the example or if you haven’t checked the requirements.",
-                        elem_classes=["td-section-title", "td-fit-heading"],
-                    )
-                    fit = gr.Radio(
-                        FIT_CHOICES, value=pipeline.DEFAULT_FIT, container=False,
-                        show_label=False, label="Company fit", elem_id="tender-fit",
-                    )
                     run_button = gr.Button("Analyse tender", variant="primary", elem_id="tender-analyse")
+                    with gr.Accordion("Company eligibility (optional)", open=False, elem_id="tender-eligibility"):
+                        gr.Markdown(
+                            "Tender Desk reads the notice and estimates competition. If you’ve already "
+                            "checked that your company has the required experience or certifications, "
+                            "record the outcome here. For a quick test, select **Analyse tender** directly.",
+                            elem_classes="td-help",
+                        )
+                        fit = gr.Radio(
+                            FIT_CHOICES, value=pipeline.DEFAULT_FIT, container=False,
+                            show_label=False, label="Company eligibility", elem_id="tender-fit",
+                        )
                 with gr.Column(scale=5, min_width=0, elem_classes=["td-panel", "td-result"]):
-                    gr.Markdown("## 3. Read the result", elem_classes="td-section-title")
+                    gr.Markdown("## 2. Read the result", elem_classes="td-section-title")
                     guidance = gr.Markdown(EMPTY_RESULT, elem_id="tender-guidance")
                     with gr.Column(elem_id="tender-expanded"):
                         summary = gr.Markdown(elem_id="tender-facts")
